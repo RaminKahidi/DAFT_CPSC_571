@@ -37,6 +37,9 @@ PROGRESSION_STATUS = {
     "yes": np.array([1], dtype=np.uint8),
 }
 
+# default_roi = "Left-Hippocampus"
+default_roi = "breast"
+
 DataTransformFn = Callable[[Union[np.ndarray, torch.Tensor]], Union[np.ndarray, torch.Tensor]]
 TargetTransformFn = Callable[[str], np.ndarray]
 
@@ -124,7 +127,7 @@ class HDF5Dataset(Dataset):
         self.target_transform = target_transform
         self._load(filename, dataset_name)
 
-    def _load(self, filename, dataset_name, roi="Left-Hippocampus"):
+    def _load(self, filename, dataset_name, roi=default_roi):
         data = []
         targets = {k: [] for k in self.target_labels}
         visits = []
@@ -222,7 +225,7 @@ class HDF5DatasetHeterogeneous(HDF5Dataset):
             self._drop_missing()
 
     # overrides
-    def _load(self, filename, dataset_name, roi="Left-Hippocampus"):
+    def _load(self, filename, dataset_name, roi=default_roi):
         data = []
         targets = {k: [] for k in self.target_labels}
         visits = []

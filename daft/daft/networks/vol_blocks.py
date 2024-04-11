@@ -174,6 +174,7 @@ class FilmBase(nn.Module, metaclass=ABCMeta):
 
         return out
 
+tabular_features = 4
 
 class FilmBlock(FilmBase):
     def __init__(
@@ -182,7 +183,7 @@ class FilmBlock(FilmBase):
         out_channels: int,
         bn_momentum: float = 0.1,
         stride: int = 2,
-        ndim_non_img: int = 15,
+        ndim_non_img: int = tabular_features,
         location: int = 0,
         activation: str = "linear",
         scale: bool = True,
@@ -264,7 +265,7 @@ class DAFTBlock(FilmBase):
         out_channels: int,
         bn_momentum: float = 0.1,
         stride: int = 2,
-        ndim_non_img: int = 15,
+        ndim_non_img: int = tabular_features,
         location: int = 0,
         activation: str = "linear",
         scale: bool = True,
