@@ -24,7 +24,7 @@ import ray
 import torch
 
 from daft.evaluate import load_model_and_evaluate
-from DAFTP.train import main as main_train
+from train import main as main_train
 
 
 @ray.remote(num_gpus=1)
