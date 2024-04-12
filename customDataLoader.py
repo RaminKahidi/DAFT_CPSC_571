@@ -11,7 +11,24 @@ from monai.data import Dataset, DataLoader
 import pandas as pd
 import pydicom
 
-label_column = "Tumor Progression"
+# label_column = "Tumor Progression"
+label_columns = ["Tumor Progression_1.0","Tumor Progression_2.0","Tumor Progression_3.0","Tumor Progression_4.0"]
+
+def resize(img):
+    print(f"img shape: {img.shape}")
+    # desired_shape = (170, 512, 512)
+    desired_shape = (210, 512, 512)
+    
+    pad_width = []
+    for i in range(len(desired_shape)):
+        width = max(desired_shape[i] - img.shape[i], 0)
+        pad_width.append((int(width // 2), int(width - (width // 2))))
+
+    padded_image = np.pad(img, pad_width, mode='constant')
+    padded_image = torch.tensor(padded_image)
+    print(f"padded image shape: {padded_image.shape}")
+    return padded_image
+    
 
 def load(file_path):
     """
@@ -116,6 +133,9 @@ class CombinedDataset(Dataset):
         print("checkpoint 1")
         tensor_filename = self.tensor_filenames[index]
         image_folder = os.path.join(self.data_dir, tensor_filename)
+
+        # maxXYSize = 512
+        # maxZSize = 160
         
         # Load the DICOM file
         # dicom = pydicom.dcmread(tensor_path)
@@ -126,9 +146,12 @@ class CombinedDataset(Dataset):
                 if dcm_path.suffix == ".dcm":
                     try:
                         dicom = pydicom.dcmread(dcm_path, force=True)
-                        dicom_images.append(dicom.pixel_array)
+                        dicom_images.append(dicom.pixel_array.astype(np.float32))
+                        # dicom_images.append(dicom.pixel_array)
                     except IOError as e:
                         print(f"Can't import {dcm_path.stem}")
+
+        dicom_images = resize(np.array(dicom_images))
 
         # Stack images into a 3D tensor
         tensor = np.stack(dicom_images, axis=-1)
@@ -139,24 +162,41 @@ class CombinedDataset(Dataset):
 
         # Add a new dimension to the tensor
         tensor = torch.unsqueeze(torch.tensor(tensor), 0)
+        # print(f"tensor type: {type(tensor)}")
+        print(f"tensor shape: {tensor.shape}")
+        # tensor = tensor.half()
+        # print(f"tensor type: {type(tensor)}")
+        # print(f"tensor shape: {tensor.shape}")
 
         # Get the corresponding tabular data
         tabular_row = self.tabular_data.iloc[index]
-        print("Tabular row is: ", tabular_row)
+        # print("Tabular row is: ", tabular_row)
 
         # Get the label
-        label = torch.tensor(float(tabular_row[label_column]))
+        # label = torch.tensor(float(tabular_row[label_column]))
+        label = torch.tensor([float(tabular_row[label_column]) for label_column in label_columns])
         print("Label is: ", label)
         # label = torch.tensor(1)
 
         # Remove the label from the tabular data
-        tabular_data = tabular_row.drop(label_column)
-        tabular_data = tabular_data.drop("Patient ID")
-        print("Tabular data is: ", tabular_data)
+        # tabular_data = tabular_row.drop(label_column)
+        tabular_data = tabular_row.drop(label_columns)
+        print(f"feature count: {len(tabular_data)}")
+        # tabular_data = tabular_data.drop("Patient ID")
+        # print("Tabular data is: ", tabular_data)
         # tabular_data = tabular_row
         print("checkpoint 3")
 
         # Convert the tabular data to a tensor
-        tabular_data = torch.tensor(tabular_data.values.astype(np.float32))
+        # tabular_data = torch.tensor(tabular_data.values.astype(np.float64))
+        tabular_data = torch.tensor(tabular_data.values.astype(np.float16))
+        # tabular_data = torch.tensor(float(tabular_data.values))
+        # tabular_data = torch.tensor(tabular_data.values).float()
+
+        # convert the tabular_data to list 
+        # tabular_data = tabular_data.tolist()
+        # tabular_data = [float(i) for i in tabular_data]
+
 
         return tensor, label, tabular_data
+
