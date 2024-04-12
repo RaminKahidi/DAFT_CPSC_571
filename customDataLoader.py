@@ -182,7 +182,7 @@ class CombinedDataset(Dataset):
         # tabular_data = tabular_row.drop(label_column)
         tabular_data = tabular_row.drop(label_columns)
         print(f"feature count: {len(tabular_data)}")
-        # tabular_data = tabular_data.drop("Patient ID")
+        tabular_data = tabular_data.drop("Patient ID")
         # print("Tabular data is: ", tabular_data)
         # tabular_data = tabular_row
         print("checkpoint 3")

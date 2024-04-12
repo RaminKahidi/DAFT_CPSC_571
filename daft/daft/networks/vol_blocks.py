@@ -175,7 +175,7 @@ class FilmBase(nn.Module, metaclass=ABCMeta):
         return out
 
 # tabular_features = 4
-tabular_features = 11
+tabular_features = 15
 
 class FilmBlock(FilmBase):
     def __init__(
