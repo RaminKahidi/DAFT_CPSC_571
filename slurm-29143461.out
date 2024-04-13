@@ -1,9 +1,0 @@
-==============================================
-Hostname: fg3
-Job ID: 29143461
-Node: fg3
-/home/ramin.kahidi/software/miniconda3/envs/pytorch/lib/python3.7/site-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: /home/ramin.kahidi/software/miniconda3/envs/pytorch/lib/python3.7/site-packages/torchvision/image.so: undefined symbol: _ZN5torch3jit17parseSchemaOrNameERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
-  warn(f"Failed to load image Python extension: {e}")
-==============================================
-Start: 2024-04-13 02:36:24
-End: 2024-04-13 06:18:17
