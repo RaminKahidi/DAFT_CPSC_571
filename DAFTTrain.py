@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 
 import monai
-from monai.transforms import EnsureChannelFirst, Compose, ScaleIntensity
 import logging
 import sys
 from sklearn.model_selection import KFold
@@ -16,9 +15,12 @@ from torch.cuda.amp import autocast, GradScaler
 # from torch.utils.tensorboard import SummaryWriter
 from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
 from customDataLoader import CombinedDataset
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 
 print(torch.cuda.is_available())
+
+outPrefix = "./a100Output/"
+# outPrefix = "./"
 
 
 def main(MRI_dir, tabular_dir):
@@ -34,11 +36,14 @@ def main(MRI_dir, tabular_dir):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print('DAFT')
 
+    bn_momentum = 0.99
+    basefilters = 3
+
     model = DAFT(
         in_channels=1,  
         n_outputs=4, 
-        bn_momentum=0.7,
-        n_basefilters=4
+        bn_momentum=bn_momentum,
+        n_basefilters=basefilters
     )
     model.to(device)
     loss_function = torch.nn.MSELoss()
@@ -50,21 +55,21 @@ def main(MRI_dir, tabular_dir):
     early_stop_patience = 20
     epochs_without_improvement = 0 
     # batch_size = 4
-    batch_size = 1
+    # batch_size = 1
+    # batch_size = 10
+    batch_size = 4
     val_interval = 2
     k_folds = 5
     kfold = KFold(n_splits=k_folds, shuffle=True)
 
-    # dataset_transforms = Compose([ScaleIntensity(), EnsureChannelFirst(channel_dim=0)])
-    # dataset = CombinedDataset(data_dir, bone_type, transform=dataset_transforms)
-
     # Instantiate your dataset
-    dataset = CombinedDataset(data_dir=MRI_dir, tabular_dir=tabular_dir)
+    dataset = CombinedDataset(data_dir=MRI_dir, tabular_dir=tabular_dir, workers = 20)
 
 
     fold_results = pd.DataFrame(columns=['Fold', 'Best Val Loss', 'Best Val MAE', 'Best Val R2'])
 
-    workers = 1
+    # workers = 1
+    workers = 4
 
     fold = 0
     # for fold, (train_ids, test_ids) in enumerate(kfold.split(dataset)):
@@ -77,8 +82,25 @@ def main(MRI_dir, tabular_dir):
     # test_subsampler = torch.utils.data.SubsetRandomSampler(test_ids)
     # train_loader = DataLoader(dataset, batch_size=batch_size, sampler=train_subsampler, num_workers=workers, pin_memory=torch.cuda.is_available(), drop_last=True)
     # val_loader = DataLoader(dataset, batch_size=batch_size, sampler=test_subsampler, num_workers=workers, pin_memory=torch.cuda.is_available(), drop_last=True)
-    train_loader = DataLoader(dataset, batch_size=batch_size, num_workers=workers, pin_memory=torch.cuda.is_available(), drop_last=True)
-    val_loader = DataLoader(dataset, batch_size=batch_size, num_workers=workers, pin_memory=torch.cuda.is_available(), drop_last=True)
+    # train_loader = DataLoader(dataset, batch_size=batch_size, num_workers=workers, pin_memory=torch.cuda.is_available(), drop_last=True)
+    # val_loader = DataLoader(dataset, batch_size=batch_size, num_workers=workers, pin_memory=torch.cuda.is_available(), drop_last=True)
+
+
+
+    # Define the ratio of train/test split
+    train_ratio = 0.8
+    test_ratio = 0.2
+
+    # Calculate the number of samples to include in each set.
+    train_size = int(train_ratio * len(dataset))
+    test_size = len(dataset) - train_size
+
+    # Divide the dataset by randomly selecting samples.
+    train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
+
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, num_workers=workers, pin_memory=torch.cuda.is_available(), drop_last=True)
+    val_loader = DataLoader(test_dataset, batch_size=batch_size, num_workers=workers, pin_memory=torch.cuda.is_available(), drop_last=True)
+
 
     best_val_loss = np.inf
     best_val_mae = np.inf
@@ -87,8 +109,10 @@ def main(MRI_dir, tabular_dir):
     train_records = pd.DataFrame(columns=['Epoch', 'Batch', 'Prediction', 'Loss', 'True Value'])
     val_records = pd.DataFrame(columns=['Epoch', 'Batch', 'Prediction', 'Loss', 'True Value'])
 
-    for epoch in range(1):
-        print(f"Epoch {epoch + 1}/100")
+    epochCount = 50
+
+    for epoch in range(epochCount):
+        print(f"Epoch {epoch + 1}/{epochCount}")
         model.train()
         epoch_loss = 0
 
@@ -187,8 +211,8 @@ def main(MRI_dir, tabular_dir):
 
         # save a temporary output file every 10 epochs
         if (epoch + 1) % 10 == 0:
-            train_records.to_csv(f'./tempOutputs/train_records_fold_{fold}_epoch_{epoch}.csv', index=False)
-            val_records.to_csv(f'./tempOutputs/val_records_fold_{fold}_epoch_{epoch}.csv', index=False)
+            train_records.to_csv(f'{outPrefix}tempOutputs/train_records_fold_{fold}_epoch_{epoch}_momentum_{bn_momentum}_basefilters{basefilters}.csv', index=False)
+            val_records.to_csv(f'{outPrefix}tempOutputs/val_records_fold_{fold}_epoch_{epoch}_momentum_{bn_momentum}_basefilters{basefilters}.csv', index=False)
         
 
     fold_results = fold_results.append({
@@ -197,8 +221,8 @@ def main(MRI_dir, tabular_dir):
         'Best Val MAE': best_val_mae,
         'Best Val R2': best_val_r2
     }, ignore_index=True)
-    train_records.to_csv(f'train_records_fold_{fold}_epoch_{epoch}.csv', index=False)
-    val_records.to_csv(f'val_records_fold_{fold}_epoch_{epoch}.csv', index=False)
+    train_records.to_csv(f'{outPrefix}train_records_fold_{fold}_epoch_{epoch}_momentum_{bn_momentum}_basefilters{basefilters}.csv', index=False)
+    val_records.to_csv(f'{outPrefix}val_records_fold_{fold}_epoch_{epoch}_momentum_{bn_momentum}_basefilters{basefilters}.csv', index=False)
 
     # print(f"Completed Fold {fold}")
 
@@ -206,7 +230,8 @@ def main(MRI_dir, tabular_dir):
 print("Training completed.")
 # print("Fold Results:\n", fold_results)
 
-MRI_dir = "./RawDataset/MRIs/"
+#MRI_dir = "./RawDataset/MRIs/"
+MRI_dir = "./ProcessedDataset/MRIs/"
 # tabular_dir = "./RawDataset/Clinical_and_Other_Features.xlsx"
 tabular_dir = "./RawDataset/cleaned.csv"
 main(MRI_dir=MRI_dir, tabular_dir=tabular_dir)
