@@ -14,7 +14,7 @@ We have used the [Duke-Breast-Cancer-MRI](https://www.cancerimagingarchive.net/c
 
 The MRI data was preprocessed using the MRI_Data_preprocessing.py script, which was run on a high performance computing cluster using the CPSC571Dataprocess.slurm script. 
 
-Feature extraction was done using **** python notebook. 
+Feature extraction was done using feature_extraction.ipynb python notebook. 
 
 ### Training
 
