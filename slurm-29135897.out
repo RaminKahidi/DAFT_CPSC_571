@@ -1,0 +1,5 @@
+==============================================
+Hostname: mg2
+Job ID: 29135897
+Node: mg2
+slurmstepd: error: *** JOB 29135897 ON mg2 CANCELLED AT 2024-04-12T02:15:40 ***

@@ -1,0 +1,15 @@
+==============================================
+Hostname: mc159
+Job ID: 29134955
+Node: mc159
+/home/ramin.kahidi/software/miniconda3/envs/pytorch/lib/python3.7/site-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: /home/ramin.kahidi/software/miniconda3/envs/pytorch/lib/python3.7/site-packages/torchvision/image.so: undefined symbol: _ZN5torch3jit17parseSchemaOrNameERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+  warn(f"Failed to load image Python extension: {e}")
+Traceback (most recent call last):
+  File "DataloaderTester.py", line 1, in <module>
+    from customDataLoader import CombinedDataset
+  File "/home/ramin.kahidi/CPSC571/DAFT_CPSC_571/customDataLoader.py", line 12, in <module>
+    import pydicom
+ModuleNotFoundError: No module named 'pydicom'
+==============================================
+Start: 2024-04-11 22:08:30
+End: 2024-04-11 22:09:25
