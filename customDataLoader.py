@@ -14,7 +14,8 @@ import pydicom
 from multiprocessing import Pool
 
 # label_column = "Tumor Progression"
-label_columns = ["Tumor Progression_1.0","Tumor Progression_2.0","Tumor Progression_3.0","Tumor Progression_4.0"]
+# label_columns = ["Tumor Progression_1.0","Tumor Progression_2.0","Tumor Progression_3.0","Tumor Progression_4.0"]
+label_columns = ["Tumor Progression_0","Tumor Progression_1"]
 
 def resize(img):
     print(f"img shape: {img.shape}")
