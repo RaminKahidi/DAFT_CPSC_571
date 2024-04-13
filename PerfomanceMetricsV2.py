@@ -8,7 +8,7 @@ def parse_array(s):
     return np.array([np.fromstring(line.strip(' []'), sep=' ') for line in s.splitlines()])
 
 # Load the data
-data = pd.read_csv('train_records_fold_0_epoch_43.csv')
+data = pd.read_csv('outputs/train_records_fold_0_epoch_43.csv')
 
 # Parse 'Prediction' and 'True Value' columns
 data['Prediction'] = data['Prediction'].apply(parse_array)
