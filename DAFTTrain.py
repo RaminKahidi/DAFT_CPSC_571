@@ -1,3 +1,7 @@
+# This file contains the training and validation loop for the DAFT model.
+# The input is the MRI data directory and the tabular data directory. 
+# The output is the trained model and the training and validation records.
+
 
 from DAFT.daft.networks.vol_networks import DAFT
 import torch
@@ -98,11 +102,14 @@ def main(MRI_dir, tabular_dir):
         model.train()
         epoch_loss = 0
 
+        # Iterate over the training data and update the model weights
         for batch_data in train_loader:
             inputs, labels, tabular_data = batch_data[0].to(device), batch_data[1].to(device), batch_data[2].to(device)
             if epoch == 0:
                 print(f"Training labels: {labels}")
             optimizer.zero_grad()
+
+            # Autocast is used to improve performance by using mixed precision training
             with autocast():
                 output_dict = model(inputs, tabular_data)
                 logits = output_dict["logits"]
@@ -110,6 +117,7 @@ def main(MRI_dir, tabular_dir):
                 loss = loss_function(logits.float(), labels.float())
                 print("Real loss : ", loss)
                 
+            # This is where the model learns by backpropagating
             scaler.scale(loss).backward()
             scaler.step(optimizer)
             scaler.update()
@@ -182,21 +190,12 @@ def main(MRI_dir, tabular_dir):
             train_records.to_csv(f'{outPrefix}tempOutputs/train_records_tabular{tabularFileName}_epoch_{epoch}_momentum_{bn_momentum}_basefilters{basefilters}_batch_size{batch_size}.csv', index=False)
             val_records.to_csv(f'{outPrefix}tempOutputs/val_records_tabular{tabularFileName}_epoch_{epoch}_momentum_{bn_momentum}_basefilters{basefilters}_batch_size{batch_size}.csv', index=False)
         
+    # Save the final output
     print(f"Best Validation Loss: {best_val_loss}, Best Validation MAE: {best_val_mae}, Best Validation R2: {best_val_r2}")
     train_records.to_csv(f'{outPrefix}train_records_tabular{tabularFileName}_epoch_{epoch}_momentum_{bn_momentum}_basefilters{basefilters}_batch_size{batch_size}.csv', index=False)
     val_records.to_csv(f'{outPrefix}val_records_tabular{tabularFileName}_epoch_{epoch}_momentum_{bn_momentum}_basefilters{basefilters}_batch_size{batch_size}.csv', index=False)
 
 print("Training completed.")
-
-#MRI_dir = "./RawDataset/MRIs/"
-# MRI_dir = "./ProcessedDataset/MRIs/"
-
-# tabular_dir = "./RawDataset/Clinical_and_Other_Features.xlsx"
-# tabular_dir = "./RawDataset/cleaned.csv"
-# tabular_dir = "./RawDataset/ER_target.csv"
-# tabular_dir = "./RawDataset/HER2_target.csv"
-
-# main(MRI_dir=MRI_dir, tabular_dir=tabular_dir)
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:

@@ -1,3 +1,7 @@
+# This file is used to preprocess the MRI data and save the processed tensors to disk.
+# The input is a directory containing the MRI data in DICOM format.
+# The output is a directory containing the processed MRI tensors in PyTorch format.
+
 import multiprocessing
 import os
 from pathlib import Path
