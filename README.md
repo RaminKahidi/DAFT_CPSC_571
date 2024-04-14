@@ -33,7 +33,7 @@ Feature extraction was done using feature_extraction.ipynb python notebook, with
 
 ### Training
 
-The model was trained and evaluated using the DAFTTrain.py script. 
+The model was trained and evaluated using the DAFTTrain.py script. The model architecture is defined in the DAFT directory, with some hyperparameters defined in the DAFTTrain.py script. The DAFT model is used thanks to its ability to combine image and tabular data into the same convolutional neural network framework. 
 
 The script takes two command line arguments: the MRI data directory and the tabular data directory. 
 
