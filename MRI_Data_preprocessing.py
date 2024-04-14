@@ -7,7 +7,13 @@ import torch
 from customDataLoader import resize
 
 
-MRI_dir = "./RawDataset/MRIs/"
+
+if len(sys.argv) != 3:
+    print("Usage: python MRI_Data_preprocessing.py <MRI_input_dir> <output_dir>")
+    sys.exit(1)
+
+MRI_dir = sys.argv[1]
+outputDir = sys.argv[2]
 
 dcm_patient_filenames = os.listdir(MRI_dir)
 print("dcm_patient_filenames: ", dcm_patient_filenames)
@@ -39,7 +45,6 @@ def process_tensor(tensor_filename):
     torch.save(tensor, os.path.join(outputDir, tensor_filename + ".pt"))
 
 # now we want to save the processed MRI tensors to a folder
-outputDir = "./ProcessedDataset/MRIs/"
 if not os.path.exists(outputDir):
     os.makedirs(outputDir)
 
@@ -53,10 +58,3 @@ if __name__ == '__main__':
 
 print("MRI tensors saved to disk.")
 
-'''
-# load in the tensors from disk
-loaded_tensors = {}
-for tensor_filename in dcm_patient_filenames:
-    tensor = torch.load(os.path.join(outputDir, tensor_filename + ".pt"))
-    loaded_tensors[tensor_filename] = tensor
-'''

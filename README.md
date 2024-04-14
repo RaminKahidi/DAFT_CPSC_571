@@ -12,16 +12,38 @@ We have used the [Duke-Breast-Cancer-MRI](https://www.cancerimagingarchive.net/c
 
 ### Preprocessing
 
+To run all scripts in the project, the following libraries are required:
+
+```bash
+pip install numpy pandas pydicom torch scikit-learn monai matplotlib
+```
+
 The MRI data was preprocessed using the MRI_Data_preprocessing.py script, which was run on a high performance computing cluster using the CPSC571Dataprocess.slurm script. 
 
-Feature extraction was done using feature_extraction.ipynb python notebook. 
+The preprocessing script takes two command line arguments: the MRI data directory and the output directory. 
+
+```bash
+python MRI_Data_preprocessing.py [MRI_dir] [output_dir]
+
+# Example
+python MRI_Data_preprocessing.py "./RawDataset/MRIs/" "./ProcessedDataset/MRIs/"
+```
+
+Feature extraction was done using feature_extraction.ipynb python notebook.
 
 ### Training
 
-The model was trained and evaluated using the DAFTTrain.py script. The script takes two command line arguments: the MRI data directory and the tabular data directory. 
+The model was trained and evaluated using the DAFTTrain.py script. 
+
+The script takes two command line arguments: the MRI data directory and the tabular data directory. 
 
 ```bash
 python DAFTTrain.py [MRI_dir] [tabular_dir]
+
+# Example
+python DAFTTrain.py "./ProcessedDataset/MRIs/" "./RawDataset/TumorSize_target.csv" > /home/ramin.kahidi/CPSC571/DAFT_CPSC_571/a100Output/slurmOutputs/output_tumor_size.txt
+python DAFTTrain.py "./ProcessedDataset/MRIs/" "./RawDataset/ER_target.csv" > /home/ramin.kahidi/CPSC571/DAFT_CPSC_571/a100Output/slurmOutputs/output_ER.txt
+python DAFTTrain.py "./ProcessedDataset/MRIs/" "./RawDataset/HER2_target.csv" > /home/ramin.kahidi/CPSC571/DAFT_CPSC_571/a100Output/slurmOutputs/output_HER2.txt
 ```
 
 Given the massive size of the dataset, the training process was done on a high performance computing cluster using the CPSC571BC.slurm script, using a100 or v100 GPUs depending on availability.
