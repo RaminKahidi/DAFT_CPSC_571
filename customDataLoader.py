@@ -1,19 +1,16 @@
 
 import os
-from pathlib import Path
 import sys
-import torch
-# import torch.nn.functional as F
-from monai.data import Dataset, DataLoader
+from multiprocessing import Pool
+from pathlib import Path
+
 import numpy as np
-import monai
-from monai.data import Dataset, DataLoader
 import pandas as pd
+import torch
+import monai
+from monai.data import Dataset
 import pydicom
 
-from multiprocessing import Pool
-
-# label_column = "Tumor Progression"
 # label_columns = ["Tumor Progression_1.0","Tumor Progression_2.0","Tumor Progression_3.0","Tumor Progression_4.0"]
 label_columns = ["Tumor Progression_0","Tumor Progression_1"]
 

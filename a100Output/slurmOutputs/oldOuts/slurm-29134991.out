@@ -1,0 +1,11 @@
+==============================================
+Hostname: fg3
+Job ID: 29134991
+Node: fg3
+Traceback (most recent call last):
+  File "DAFTTrain.py", line 2, in <module>
+    from DAFT.daft.models.base import BaseModel
+ModuleNotFoundError: No module named 'DAFT'
+==============================================
+Start: 2024-04-11 22:22:06
+End: 2024-04-11 22:22:06

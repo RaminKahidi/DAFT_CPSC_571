@@ -24,7 +24,7 @@ echo Node: $SLURM_NODELIST
 
 start=`date +%Y-%m-%d\ %H:%M:%S`
 
-python MRI_Data_prep.py
+python MRI_Data_preprocessing.py
 
 
 end=`date +%Y-%m-%d\ %H:%M:%S`
