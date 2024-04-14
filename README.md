@@ -6,7 +6,7 @@ This project aims to enhance the diagnosis of breast cancer by combining MRI and
 
 ## Data
 
-We have used the [Duke-Breast-Cancer-MRI](https://www.cancerimagingarchive.net/collection/duke-breast-cancer-mri/) data set, containing MRI scans and tabular data for 922 patients. Feature extraction was used, along with preprocessing of the MRI scan before training the model on an 80/20 train/validation split.
+We have used the [Duke-Breast-Cancer-MRI](https://www.cancerimagingarchive.net/collection/duke-breast-cancer-mri/) data set, containing MRI scans and tabular data for 922 patients. Feature extraction was used, along with preprocessing of the MRI scan before training the model on an 80/20 train/validation split. Due to the massive size of this dataset, we have not included it in this repository or in our final submission, however it can be downloaded at the link above. 
 
 ## Usage
 
@@ -18,7 +18,7 @@ To run all scripts in the project, the following libraries are required:
 pip install numpy pandas pydicom torch scikit-learn monai matplotlib
 ```
 
-The MRI data was preprocessed using the MRI_Data_preprocessing.py script, which was run on a high performance computing cluster using the CPSC571Dataprocess.slurm script. 
+The MRI data was preprocessed using the MRI_Data_preprocessing.py script, which was run on a high performance computing cluster using the CPSC571Dataprocess.slurm script. The preprocessing script reads the MRI data from the RawDataset/MRIs directory, pads the images to the same size and saves them as tensors. 
 
 The preprocessing script takes two command line arguments: the MRI data directory and the output directory. 
 
@@ -29,7 +29,7 @@ python MRI_Data_preprocessing.py [MRI_dir] [output_dir]
 python MRI_Data_preprocessing.py "./RawDataset/MRIs/" "./ProcessedDataset/MRIs/"
 ```
 
-Feature extraction was done using feature_extraction.ipynb python notebook.
+Feature extraction was done using feature_extraction.ipynb python notebook, with the three outputs shown in the RawDataset directory.
 
 ### Training
 
