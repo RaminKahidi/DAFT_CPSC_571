@@ -55,8 +55,7 @@ def main(MRI_dir, tabular_dir):
     loss_function = torch.nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr)
     scaler = GradScaler()
-    # early_stop_patience = 20
-    early_stop_patience = 200
+    early_stop_patience = 20
     epochs_without_improvement = 0 
     # batch_size = 4
     # batch_size = 1
